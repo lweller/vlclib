@@ -49,6 +49,7 @@ public class VlcManager {
     private static final String COMMAND_SETUP_INPUT = "setup %s input %s";
     private static final String COMMAND_SETUP_INPUTDEL = "setup %s inputdel %s";
     private static final String COMMAND_SETUP_OUTPUT = "setup %s output %s";
+    private static final String COMMAND_SETUP_OPTION = "setup %s option %s";
     private static final String COMMAND_DEL = "del %s";
     private static final String COMMAND_PLAY = "control %s play";
     private static final String COMMAND_PLAY_ITEM = COMMAND_PLAY + " %s";
@@ -398,6 +399,21 @@ public class VlcManager {
         sendCommand(format(COMMAND_SEEK_PERCENTAGE, mediaName, position));
         waitForAndClear(NORMAL_PROMPT);
         LOG.debug(format("media %s seeked to relative position %.2f %%", mediaName, position * 100));
+    }
+
+    /**
+     * Sets an option for a given media.
+     *
+     * @param mediaName
+     *            name of media to set option for
+     * @param option
+     *            the option to set
+     * @throws VlcConnectionException
+     *             when there is a problem with the connection with VLC (see cause for detailed reason)
+     */
+    public void setupOption(String mediaName, VlcOption option) throws VlcConnectionException {
+        sendCommand(format(COMMAND_SETUP_OPTION, mediaName, option));
+        waitForAndClear(NORMAL_PROMPT);
     }
 
     /**

@@ -35,6 +35,10 @@ public class VlcInput {
         return new File(path);
     }
 
+    public String getPath() {
+        return path;
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;

@@ -71,11 +71,17 @@ public class VlcManagerTest {
 
     private static final String SAMPLE_COMMAND = "new channel42 broadcast enabled";
 
+    private static final VlcOption OPTION_WITH_VALUE = new VlcOption("sout-display-delay", "150");
+    private static final VlcOption OPTION_WITHOUT_VALUE = new VlcOption("sout-keep");
+
     private static final String EXPECTED_NEW_MEDIA_COMMAND = format("new %s %%s %%s", MEDIA_NAME);
     private static final String EXPECTED_DEL_MEDIA_COMMAND = format("del %s", MEDIA_NAME);
     private static final String EXPECTED_SETUP_OUTPUT_COMMAND = format("setup %s output %s", MEDIA_NAME, OUTPUT);
     private static final String EXPECTED_SETUP_INPUT_COMMAND = format("setup %s input %s", MEDIA_NAME, MEDIA_ITEM_FILE_PATH_1);
     private static final String EXPECTED_SETUP_INPUTDEL_ALL_COMMAND = format("setup %s inputdel all", MEDIA_NAME);
+    private static final String EXPECTED_SETUP_OPTION_WITH_VALUE_COMMAND = format("setup %s option %s=%s", MEDIA_NAME, OPTION_WITH_VALUE.getName(),
+            OPTION_WITH_VALUE.getValue());
+    private static final String EXPECTED_SETUP_OPTION_WITHOUT_VALUE_COMMAND = format("setup %s option %s", MEDIA_NAME, OPTION_WITHOUT_VALUE.getName());
     private static final String EXPECTED_PLAY_COMMAND = format("control %s play", MEDIA_NAME);
     private static final String EXPECTED_PLAY_ITEM_COMMAND = format("control %s play %s", MEDIA_NAME, STATE_PLAY_LIST_INDEX);
     private static final String EXPECTED_SEEK_PERCENTAGE_COMMAND = format("control %s seek %f", MEDIA_NAME, SEEK_PERCENTAGE_POSITION);
@@ -499,6 +505,34 @@ public class VlcManagerTest {
         InOrder order = inOrder(outputStream);
         order.verify(outputStream).write((SAMPLE_COMMAND + '\n').getBytes());
         order.verify(outputStream).flush();
+    }
+
+    @Test
+    public void shouldSetupOptionWithoutValue() throws VlcConnectionException {
+        // given
+        mockedBaseCommunicationMethods();
+
+        // when
+        vlcManager.setupOption(MEDIA_NAME, OPTION_WITHOUT_VALUE);
+
+        // then
+        InOrder order = inOrder(vlcManager);
+        order.verify(vlcManager).sendCommand(EXPECTED_SETUP_OPTION_WITHOUT_VALUE_COMMAND);
+        order.verify(vlcManager).waitForAndClear(NORMAL_PROMPT);
+    }
+
+    @Test
+    public void shouldSetupOptionWithValue() throws VlcConnectionException {
+        // given
+        mockedBaseCommunicationMethods();
+
+        // when
+        vlcManager.setupOption(MEDIA_NAME, OPTION_WITH_VALUE);
+
+        // then
+        InOrder order = inOrder(vlcManager);
+        order.verify(vlcManager).sendCommand(EXPECTED_SETUP_OPTION_WITH_VALUE_COMMAND);
+        order.verify(vlcManager).waitForAndClear(NORMAL_PROMPT);
     }
 
     @Test(expected = VlcConnectionException.class)
