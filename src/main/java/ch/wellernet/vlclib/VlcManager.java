@@ -200,6 +200,10 @@ public class VlcManager {
         sendCommand(format(COMMANDE_NEW, media.getName(), media.getType().value(), media.isEnabed() ? ENABLED : DISABLED));
         waitForAndClear(NORMAL_PROMPT);
         sendCommand(format(COMMAND_SETUP_OUTPUT, media.getName(), media.getOutput()));
+        waitForAndClear(NORMAL_PROMPT);
+        for (VlcOption option : media.getOptions()) {
+            setupOption(media.getName(), option);
+        }
         LOG.debug(format("created new media %s", media));
     }
 

@@ -238,20 +238,25 @@ public class VlcManagerTest {
         vlcManager.createMedia(media);
 
         // then
-        verifyCreateMedia(BROADCAST, false);
+        verifyCreateMedia(inOrder(vlcManager), BROADCAST, false);
     }
 
     @Test
     public void shouldCreateNewBroadcastMediaEnabled() throws VlcConnectionException {
         // given
         mockedBaseCommunicationMethods();
-        VlcMedia media = new VlcMedia(MEDIA_NAME, BROADCAST, true, OUTPUT);
+        VlcMedia media = new VlcMedia(MEDIA_NAME, BROADCAST, true, OUTPUT, OPTION_WITH_VALUE, OPTION_WITHOUT_VALUE);
 
         // when
         vlcManager.createMedia(media);
 
         // then
-        verifyCreateMedia(BROADCAST, true);
+        InOrder order = inOrder(vlcManager);
+        verifyCreateMedia(order, BROADCAST, true);
+        order.verify(vlcManager).sendCommand(EXPECTED_SETUP_OPTION_WITH_VALUE_COMMAND);
+        order.verify(vlcManager).waitForAndClear(NORMAL_PROMPT);
+        order.verify(vlcManager).sendCommand(EXPECTED_SETUP_OPTION_WITHOUT_VALUE_COMMAND);
+        order.verify(vlcManager).waitForAndClear(NORMAL_PROMPT);
     }
 
     @Test
@@ -264,20 +269,20 @@ public class VlcManagerTest {
         vlcManager.createMedia(media);
 
         // then
-        verifyCreateMedia(SCHEDULE, true);
+        verifyCreateMedia(inOrder(vlcManager), SCHEDULE, true);
     }
 
     @Test
     public void shouldCreateNewVodMedia() throws VlcConnectionException {
         // given
         mockedBaseCommunicationMethods();
-        VlcMedia media = new VlcMedia(MEDIA_NAME, VOD, true, OUTPUT);
+        VlcMedia media = new VlcMedia(MEDIA_NAME, VOD, true, OUTPUT, OPTION_WITH_VALUE, OPTION_WITHOUT_VALUE);
 
         // when
         vlcManager.createMedia(media);
 
         // then
-        verifyCreateMedia(VOD, true);
+        verifyCreateMedia(inOrder(vlcManager), VOD, true);
     }
 
     @Test
@@ -587,12 +592,12 @@ public class VlcManagerTest {
         }).when(inputStream).read(any(byte[].class));
     }
 
-    private void verifyCreateMedia(MediaType type, boolean enabled) throws VlcConnectionException {
-        InOrder order = inOrder(vlcManager);
+    private void verifyCreateMedia(InOrder order, MediaType type, boolean enabled) throws VlcConnectionException {
         order.verify(vlcManager).sendCommand(format(EXPECTED_DEL_MEDIA_COMMAND, MEDIA_NAME));
         order.verify(vlcManager).waitForAndClear(NORMAL_PROMPT);
         order.verify(vlcManager).sendCommand(format(EXPECTED_NEW_MEDIA_COMMAND, type.value(), enabled ? ENABLED : DISABLED));
         order.verify(vlcManager).waitForAndClear(NORMAL_PROMPT);
         order.verify(vlcManager).sendCommand(EXPECTED_SETUP_OUTPUT_COMMAND);
+        order.verify(vlcManager).waitForAndClear(NORMAL_PROMPT);
     }
 }

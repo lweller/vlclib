@@ -1,16 +1,23 @@
 package ch.wellernet.vlclib;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.unmodifiableList;
+
+import java.util.List;
+
 public class VlcMedia {
     private final String name;
     private final MediaType type;
     private final boolean enabed;
     private final VlcOutput output;
+    private final List<VlcOption> options;
 
-    public VlcMedia(String name, MediaType type, boolean enabed, VlcOutput output) {
+    public VlcMedia(String name, MediaType type, boolean enabed, VlcOutput output, VlcOption... options) {
         this.name = name;
         this.type = type;
         this.enabed = enabed;
         this.output = output;
+        this.options = unmodifiableList(asList(options));
     }
 
     @Override
@@ -37,6 +44,10 @@ public class VlcMedia {
 
     public String getName() {
         return name;
+    }
+
+    public List<VlcOption> getOptions() {
+        return options;
     }
 
     public VlcOutput getOutput() {
