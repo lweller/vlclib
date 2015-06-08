@@ -48,6 +48,7 @@ public class VlcManager {
     private static final String COMMANDE_NEW = "new %s %s %s";
     private static final String COMMAND_SETUP_INPUT = "setup %s input %s";
     private static final String COMMAND_SETUP_INPUTDEL = "setup %s inputdel %s";
+    private static final String COMMAND_SETUP_INPUTDELN = "setup %s inputdeln %d";
     private static final String COMMAND_SETUP_OUTPUT = "setup %s output %s";
     private static final String COMMAND_SETUP_OPTION = "setup %s option %s";
     private static final String COMMAND_DEL = "del %s";
@@ -57,6 +58,8 @@ public class VlcManager {
     private static final String COMMAND_SEEK_DURATION = "control %s seek %dms";
     private static final String COMMAND_STOP = "control %s stop";
     private static final String COMMAND_SHOW = "show %s";
+    private static final String COMMAND_LOOP = "loop %s";
+    private static final String COMMAND_UNLOOP = "unloop %s";
 
     // @formatter:off
     private static final Pattern COMMAND_SHOW_INPUTS = compile(""
@@ -372,6 +375,23 @@ public class VlcManager {
     }
 
     /**
+     * Removes a multimedia item from media. If media does not exists or has no such item, nothing will be done.
+     *
+     * @param mediaName
+     *            name of media from which the item will be removed
+     * @param playListIndex
+     *            index (starting form 1) of item to remove
+     *
+     * @throws VlcConnectionException
+     *             when there is a problem with the connection with VLC (see cause for detailed reason)
+     */
+    public void removeInputItem(String mediaName, int playListIndex) throws VlcConnectionException {
+        sendCommand(format(COMMAND_SETUP_INPUTDELN, mediaName, playListIndex));
+        waitForAndClear(NORMAL_PROMPT);
+        LOG.debug(format("removed input %d of media %s", playListIndex, mediaName));
+    }
+
+    /**
      * Continues playing current item at given absolute position, which may be before or after current position. If the media is stopped command will
      * have no effect.
      *
@@ -432,6 +452,25 @@ public class VlcManager {
         sendCommand(format(COMMAND_STOP, mediaName));
         waitForAndClear(NORMAL_PROMPT);
         LOG.debug(format("stopped media %s", mediaName));
+    }
+
+    /**
+     * Toggle the loop state of a media (starts looping if currently not looping and vice versa).
+     *
+     * @param mediaName
+     *            name of media to toggle the loop state
+     * @throws VlcConnectionException
+     *             when there is a problem with the connection with VLC (see cause for detailed reason)
+     */
+    public void toggleLoopState(String mediaName) throws VlcConnectionException {
+        if (readLoopState(mediaName)) {
+            sendCommand(format(COMMAND_LOOP, mediaName));
+            LOG.debug(format("media %s is now looping", mediaName));
+        } else {
+            sendCommand(format(COMMAND_UNLOOP, mediaName));
+            LOG.debug(format("media %s is not looping anymore", mediaName));
+        }
+        waitForAndClear(NORMAL_PROMPT);
     }
 
     /**

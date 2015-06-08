@@ -78,6 +78,7 @@ public class VlcManagerTest {
     private static final String EXPECTED_DEL_MEDIA_COMMAND = format("del %s", MEDIA_NAME);
     private static final String EXPECTED_SETUP_OUTPUT_COMMAND = format("setup %s output %s", MEDIA_NAME, OUTPUT);
     private static final String EXPECTED_SETUP_INPUT_COMMAND = format("setup %s input %s", MEDIA_NAME, MEDIA_ITEM_FILE_PATH_1);
+    private static final String EXPECTED_SETUP_INPUTDELN_COMMAND = format("setup %s inputdeln %d", MEDIA_NAME, STATE_PLAY_LIST_INDEX);
     private static final String EXPECTED_SETUP_INPUTDEL_ALL_COMMAND = format("setup %s inputdel all", MEDIA_NAME);
     private static final String EXPECTED_SETUP_OPTION_WITH_VALUE_COMMAND = format("setup %s option %s=%s", MEDIA_NAME, OPTION_WITH_VALUE.getName(),
             OPTION_WITH_VALUE.getValue());
@@ -88,6 +89,8 @@ public class VlcManagerTest {
     private static final String EXPECTED_SEEK_DURATION_COMMAND = format("control %s seek %dms", MEDIA_NAME, SEEK_DURATION_POSITION.getMillis());
     private static final String EXPECTED_STOP_COMMAND = format("control %s stop", MEDIA_NAME);
     private static final String EXPECTED_SHOW_COMMAND = format("show %s", MEDIA_NAME);
+    private static final String EXPECTED_TOOGLE_TO_LOOP_COMMAND = format("loop %s", MEDIA_NAME);
+    private static final String EXPECTED_TOOGLE_TO_UNLOOP_COMMAND = format("unloop %s", MEDIA_NAME);
 
     private static final String WRONG_RESULT = "an error happend\n> ";
 
@@ -118,6 +121,9 @@ public class VlcManagerTest {
             + "                playlistindex : %s\n"
             + "> ", STATE_LOOP ? "yes" : "no", MEDIA_ITEM_FILE_PATH_1, MEDIA_ITEM_FILE_PATH_2, STATE_POSITION,
                     MEDIA_ITEM_LENGTH_1.getMillis(), STATE_PLAY_LIST_INDEX);
+
+
+
     // @formatter:on
 
     // under test
@@ -387,6 +393,20 @@ public class VlcManagerTest {
     }
 
     @Test
+    public void shouldRemoveInputItem() throws VlcConnectionException {
+        // given
+        mockedBaseCommunicationMethods();
+
+        // when
+        vlcManager.removeInputItem(MEDIA_NAME, STATE_PLAY_LIST_INDEX);
+
+        // then
+        InOrder order = inOrder(vlcManager);
+        order.verify(vlcManager).sendCommand(EXPECTED_SETUP_INPUTDELN_COMMAND);
+        order.verify(vlcManager).waitForAndClear(NORMAL_PROMPT);
+    }
+
+    @Test
     public void shouldRetrunEmptyListIfReadPlayListIndexFails() throws VlcConnectionException, IOException {
         // given
         doNothing().when(vlcManager).sendCommand(anyString());
@@ -574,6 +594,36 @@ public class VlcManagerTest {
 
         // then
         // a VlcConnectionException is expected
+    }
+
+    @Test
+    public void shouldToggleLoopStateToLoop() throws VlcConnectionException {
+        // given
+        mockedBaseCommunicationMethods();
+        doReturn(true).when(vlcManager).readLoopState(anyString());
+
+        // when
+        vlcManager.toggleLoopState(MEDIA_NAME);
+
+        // then
+        InOrder order = inOrder(vlcManager);
+        order.verify(vlcManager).sendCommand(EXPECTED_TOOGLE_TO_LOOP_COMMAND);
+        order.verify(vlcManager).waitForAndClear(NORMAL_PROMPT);
+    }
+
+    @Test
+    public void shouldToggleLoopStateToUnloop() throws VlcConnectionException {
+        // given
+        mockedBaseCommunicationMethods();
+        doReturn(false).when(vlcManager).readLoopState(anyString());
+
+        // when
+        vlcManager.toggleLoopState(MEDIA_NAME);
+
+        // then
+        InOrder order = inOrder(vlcManager);
+        order.verify(vlcManager).sendCommand(EXPECTED_TOOGLE_TO_UNLOOP_COMMAND);
+        order.verify(vlcManager).waitForAndClear(NORMAL_PROMPT);
     }
 
     private void mockedBaseCommunicationMethods() throws VlcConnectionException {
