@@ -181,7 +181,7 @@ public class VlcManager {
             waitForAndClear(ANY_PROMPT);
             LOG.debug(format("connected successfully to %s:%s", hostname, port));
         } catch (IOException exception) {
-            LOG.warn(format("caught exception while connecting to %s%:%s", hostname, port), exception);
+            LOG.warn(format("caught exception while connecting to %s:%s", hostname, port), exception);
             throw new VlcConnectionException(exception);
         }
     }
