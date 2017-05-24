@@ -46,7 +46,7 @@ public class VlcManager {
     static final String DISABLED = "disabled";
 
     private static final String COMMANDE_NEW = "new %s %s %s";
-    private static final String COMMAND_SETUP_INPUT = "setup %s input %s";
+    private static final String COMMAND_SETUP_INPUT = "setup %s input \"%s\"";
     private static final String COMMAND_SETUP_INPUTDEL = "setup %s inputdel %s";
     private static final String COMMAND_SETUP_INPUTDELN = "setup %s inputdeln %d";
     private static final String COMMAND_SETUP_OUTPUT = "setup %s output %s";

@@ -77,7 +77,7 @@ public class VlcManagerTest {
     private static final String EXPECTED_NEW_MEDIA_COMMAND = format("new %s %%s %%s", MEDIA_NAME);
     private static final String EXPECTED_DEL_MEDIA_COMMAND = format("del %s", MEDIA_NAME);
     private static final String EXPECTED_SETUP_OUTPUT_COMMAND = format("setup %s output %s", MEDIA_NAME, OUTPUT);
-    private static final String EXPECTED_SETUP_INPUT_COMMAND = format("setup %s input %s", MEDIA_NAME, MEDIA_ITEM_FILE_PATH_1);
+    private static final String EXPECTED_SETUP_INPUT_COMMAND = format("setup %s input \"%s\"", MEDIA_NAME, MEDIA_ITEM_FILE_PATH_1);
     private static final String EXPECTED_SETUP_INPUTDELN_COMMAND = format("setup %s inputdeln %d", MEDIA_NAME, STATE_PLAY_LIST_INDEX);
     private static final String EXPECTED_SETUP_INPUTDEL_ALL_COMMAND = format("setup %s inputdel all", MEDIA_NAME);
     private static final String EXPECTED_SETUP_OPTION_WITH_VALUE_COMMAND = format("setup %s option %s=%s", MEDIA_NAME, OPTION_WITH_VALUE.getName(),
